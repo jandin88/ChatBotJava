@@ -14,7 +14,7 @@ input.addEventListener('keyup', function(event) {
 document.addEventListener('DOMContentLoaded', vaiParaFinalDoChat);
 
 async function enviarMensagem() {
-    if(input.value == '' || input.value == null) return;
+    if(input.value === '' || input.value == null) return;
 
     const mensagem = input.value;
     input.value = '';
