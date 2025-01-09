@@ -15,7 +15,9 @@ public class ChatBotService {
     }
 
     public Flux<String> responseQuestion(String pergunta){
-        String promptSystem = "Você é um chatbot de atendimento a clientes de um ecommerce e deve responder apenas perguntas relacionadas com o ecommerce";
+        String promptSystem = "Seu nome é Dury é um chatbot especializado em atendimento ao cliente de um e-commerce. " +
+                        "Sua função é responder exclusivamente a perguntas relacionadas aos produtos, serviços e " +
+                        "processos deste e-commerce.";
         DataRequestChatAi dados= new DataRequestChatAi(promptSystem, pergunta);
         return client.enviarRequestChatCompletion(dados);
     }

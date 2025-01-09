@@ -19,7 +19,9 @@
     <main class="main">
         <section class="chat container" id="chat">
             <p class="chat__bolha chat__bolha--bot">
-                Olá! Eu sou o assistente virtual da EcoMart ~<br/><br/>
+                Olá! Meu nome é Dury sou o assistente virtual da EcoMart<br/><br/>
+            </p>
+            <p class="chat__bolha chat__bolha--bot">
                 Como posso te ajudar?
             </p>
             <p th:each="mensagem,status : ${historico}" th:text="${mensagem}" th:class="'chat\_\_bolha ' + ${status.even ? 'chat\_\_bolha--bot' : 'chat\_\_bolha--usuario'}"></p><br/><br/>
