@@ -27,7 +27,7 @@ public class ChatController {
     public Flux<String> responderPerguntaStreaming(@RequestBody QuestionDto dto) {
         // Obtém o fluxo de resposta da pergunta
         return chatBotService.responseQuestion(dto.pergunta())
-                .delayElements(Duration.ofMillis(100)); // Opcional: simula uma pequena latência
+                .delayElements(Duration.ofMillis(100));
     }
 
     @GetMapping

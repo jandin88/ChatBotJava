@@ -1,9 +1,12 @@
 package org.chat.chatbotjava.infra.openai;
 
 import com.openai.client.OpenAIClient;
+import com.openai.client.OpenAIClientImpl;
 import com.openai.models.*;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.core.http.StreamResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -14,8 +17,11 @@ import java.util.List;
 @Component
 public class OpenaiApiClient {
 
+    private static final Logger log = LoggerFactory.getLogger(OpenaiApiClient.class);
+
     private final OpenAIClient openAiClient;
     private final List<ChatCompletionMessageParam> mensagens = new ArrayList<>();
+
     public OpenaiApiClient(@Value("${app.openai.api.key}") String apiKey) {
         this.openAiClient = OpenAIOkHttpClient.builder()
                 .apiKey(apiKey)
@@ -23,34 +29,39 @@ public class OpenaiApiClient {
 
     }
 
-    public Flux<String> enviarRequestChatCompletion(DataRequestChatAi dados) {
+    public Flux<String> sendRequestChatCompletion(DataRequestChatAi dados) {
 
         if(mensagens.isEmpty()) {
             mensagens.add(ChatCompletionMessageParam.ofChatCompletionSystemMessageParam(ChatCompletionSystemMessageParam.builder()
-                    .role(ChatCompletionSystemMessageParam.Role.SYSTEM)
-                    .content(ChatCompletionSystemMessageParam.Content.ofTextContent(dados.promptSystem()))
-                    .build()));
+                            .role(ChatCompletionSystemMessageParam.Role.SYSTEM)
+                            .content(ChatCompletionSystemMessageParam.Content.ofTextContent(dados.promptSystem()))
+                            .build()));
         }
 
         mensagens.add(ChatCompletionMessageParam.ofChatCompletionUserMessageParam(ChatCompletionUserMessageParam.builder()
                 .role(ChatCompletionUserMessageParam.Role.USER)
                 .content(ChatCompletionUserMessageParam.Content.ofTextContent(dados.promptUser()))
                 .build()));
+
         ChatCompletionCreateParams completionCreateParams = ChatCompletionCreateParams.builder()
                 .model(ChatModel.GPT_4O_MINI)
-                .maxTokens(100)
+                .maxTokens(400)
+                .temperature(0.3)
                 .messages(mensagens)
                 .build();
 
-        // Processar o streaming da resposta
-        return streamFluxo(completionCreateParams)
-                .doOnNext(resposta -> {
-                    mensagens.add(ChatCompletionMessageParam.ofChatCompletionAssistantMessageParam(ChatCompletionAssistantMessageParam.builder()
-                            .role(ChatCompletionAssistantMessageParam.Role.ASSISTANT)
-                            .content(ChatCompletionAssistantMessageParam.Content.ofTextContent(resposta))
-                            .build()));
-                });
+
+
+        return streamFluxo(completionCreateParams);
     }
+
+//    public List<ChatCompletionMessageParam> loadConversations(){
+//        if(mensagens.isEmpty()){
+//            System.out.println("\n\n\n\n\n "+mensagens+"\n\n\n\n\n");
+//            return mensagens;
+//        }
+//        return null;
+//    }
 
     private Flux<String> streamFluxo(ChatCompletionCreateParams completionCreateParams) {
         return Flux.create(sink -> {
@@ -64,8 +75,10 @@ public class OpenaiApiClient {
 
                 sink.complete();
             } catch (Exception e) {
+                log.error("Erro durante o streaming", e);
                 sink.error(e);
             }
         });
     }
+
 }
