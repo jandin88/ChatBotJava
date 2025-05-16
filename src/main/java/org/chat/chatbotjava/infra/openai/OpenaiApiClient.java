@@ -21,11 +21,22 @@ public class OpenaiApiClient {
 
     private final OpenAIClient openAiClient;
     private final List<ChatCompletionMessageParam> mensagens = new ArrayList<>();
+    private final String version;
+    private final Integer maxtoken;
+    private final Double temperature;
 
-    public OpenaiApiClient(@Value("${app.openai.api.key}") String apiKey) {
+    public OpenaiApiClient(
+          @Value("${app.openai.api.key}")String apiKey,
+          @Value("${app.openai.api.version}")  String version,
+          @Value("${app.openai.api.maxtoken}") Integer maxtoken,
+          @Value("${app.openai.api.temperature}") Double temperature
+          ) {
         this.openAiClient = OpenAIOkHttpClient.builder()
                 .apiKey(apiKey)
                 .build();
+        this.version= version;
+        this.maxtoken= maxtoken;
+        this.temperature=temperature;
 
     }
 
@@ -44,9 +55,9 @@ public class OpenaiApiClient {
                 .build()));
 
         ChatCompletionCreateParams completionCreateParams = ChatCompletionCreateParams.builder()
-                .model(ChatModel.GPT_4O_MINI)
-                .maxTokens(400)
-                .temperature(0.3)
+              .model(version)               // modelo mais econômico :contentReference[oaicite:0]{index=0}
+                .maxTokens(maxtoken)
+                .temperature(temperature)
                 .messages(mensagens)
                 .build();
 
