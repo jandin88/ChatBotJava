@@ -27,7 +27,7 @@ async function enviarMensagem() {
     chat.appendChild(novaBolhaBot);
     vaiParaFinalDoChat();
 
-    fetch('http://localhost:8080/chat', {
+    fetch('https://chatbotjava.onrender.com', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
